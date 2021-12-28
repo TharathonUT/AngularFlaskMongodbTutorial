@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from bson import objectid
 import hashlib
+import jwt
 
 app = Flask(__name__)
 
@@ -331,3 +332,36 @@ def delete_user_task(uid, tid):
         return jsonify({"success": False})
 
     return jsonify({"success": True})
+
+@app.route("/authen/login", methods=["POST"])
+def login_user():
+    db = get_database()
+    collection = db['users']
+    users_authen = request.get_json()
+    user_username = users_authen['username']
+    user_password = hashlib.sha256(users_authen['password'].encode()).hexdigest()
+    try:
+        user_authen_data = collection.find_one({"username": user_username,"password":user_password})
+        if user_authen_data:
+            encoded_jwt = jwt.encode({"uid": str(user_authen_data['_id'])}, "testWeb", algorithm="HS256")
+            return {"success":True,"token":encoded_jwt}
+        return {"success":False}
+    except:
+        return {"success":False}
+
+
+
+@app.route("/authen/check", methods=["POST"])
+def check_is_authen():
+    db = get_database()
+    collection = db['users']
+    users_authen = request.get_json()
+    user_token = users_authen['token']
+    try:
+        decoded_data = jwt.decode(user_token, "testWeb", algorithms=["HS256"])
+        user_data = collection.find_one({"_id":objectid.ObjectId(decoded_data["uid"])})
+        if user_data:
+            return {"success":True}
+        return {"success":False}
+    except:
+        return {"success":False}
