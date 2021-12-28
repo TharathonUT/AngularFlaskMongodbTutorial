@@ -1,0 +1,9 @@
+<form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+    <input type="text" id="username" formControlName="username"><br>
+    <input type="password" id="password" formControlName="password"><br>
+    <input type="submit" value="Login">
+</form>
+
+<button (click)="getAllUser()">Get all users</button>
+
+<app-user-card *ngFor="let user of users" [user_data]="user"></app-user-card>
