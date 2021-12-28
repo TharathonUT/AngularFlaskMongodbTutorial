@@ -4,6 +4,8 @@ import hashlib
 
 app = Flask(__name__)
 
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
 
 def get_database():
     # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
