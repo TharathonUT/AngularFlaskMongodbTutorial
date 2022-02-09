@@ -1,12 +1,15 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from bson import objectid
 import hashlib
 import jwt
+import os
+from datetime import datetime
 
-
+UPLOAD_FOLDER = 'uploads'
 app = Flask(__name__)
 CORS(app)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
@@ -368,3 +371,33 @@ def check_is_authen():
         return {"success":False}
     except:
         return {"success":False}
+@app.route("/upload/<file_name>")
+def read_file(file_name):
+    if file_name == "":
+        return {"success":False}
+    
+    return send_from_directory(app.config['UPLOAD_FOLDER'], file_name)
+
+@app.route("/upload/<file_name>", methods = ['DELETE'])
+def delete_file(file_name):
+    if file_name == "":
+        return {"success":False}
+
+    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], file_name))
+    return {"success":True}
+
+@app.route("/upload", methods=['POST'])
+def upload_file():
+    print(request.files)
+    if 'file' not in request.files:
+        return {"success":False}
+    file = request.files['file']
+    if file.filename == '':
+        return {"success":False}
+    file_type = file.filename.split('.')[1]
+    current_time = datetime.now().timestamp()
+    new_file_name = str(file.filename)+str(current_time)
+    new_file_hash = hashlib.md5(new_file_name.encode()).hexdigest()
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'], new_file_hash+'.'+file_type))
+    return {"success":True}
+

@@ -46,4 +46,13 @@ export class UserService {
     }
     return []
   }
+
+  async UploadFile(form_data:FormData){
+    let test = await this.axios.post(environment.API_IP+"/upload",form_data);
+    if(test.status == 200){
+      const results:[] = test.data
+      return results
+    }
+    return []
+  }
 }

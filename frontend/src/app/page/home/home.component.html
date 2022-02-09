@@ -1,1 +1,14 @@
 <p>home works!</p>
+<video #videoPlayer>
+    <source src="http://127.0.0.1:5000/upload/e48f4061f391a56d95ef4d3a1aefc55e.mp4" type="video/mp4">
+</video>
+<p>{{current_time}}/{{total_time}}<p>
+<div>
+    <button (click)="playVideo()" id="play_btn" class="btn btn-primary"> Play </button>
+    <button id="pause_btn" class="btn btn-primary"> Pause </button>
+</div>
+<img src="">
+<form [formGroup]="uploadForm" (ngSubmit)="onUpload()">
+    <input (change)="onFileChange($event)" formControlName="file" type="file" name="name" id="name">
+    <input type="submit" value="Upload">
+</form>
